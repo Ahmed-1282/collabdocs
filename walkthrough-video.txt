@@ -1,1 +1,6 @@
-Walkthrough video: (paste your unlisted Loom or YouTube URL here)
+Walkthrough video (4 min): https://www.loom.com/share/ec5bfa861e244dfeb981019951864e1c
+
+Covers the main user flow, what works end to end, what was intentionally
+deprioritized, key implementation decisions, and how AI supported the work.
+
+Live product: https://collabdocs-orcin.vercel.app

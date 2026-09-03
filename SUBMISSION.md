@@ -8,7 +8,7 @@
 | Item | Link |
 | --- | --- |
 | Live product | <https://collabdocs-orcin.vercel.app> |
-| Walkthrough video | _(add Loom/YouTube URL — also in `walkthrough-video.txt`)_ |
+| Walkthrough video | <https://www.loom.com/share/ec5bfa861e244dfeb981019951864e1c> |
 | Source code | This repository |
 
 ## Test accounts
