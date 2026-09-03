@@ -52,7 +52,7 @@ export function TitleInput({
       aria-label="Document title"
       onChange={(event) => rename(event.target.value)}
       onBlur={() => !title.trim() && setTitle(initialTitle)}
-      className="min-w-0 flex-1 truncate rounded border border-transparent px-2 py-1 text-sm font-medium outline-none transition hover:border-[var(--border)] focus:border-[var(--accent)] disabled:cursor-default disabled:hover:border-transparent"
+      className="min-w-0 max-w-[20rem] flex-1 truncate rounded-md bg-transparent px-2 py-1 text-sm font-semibold outline-none ring-1 ring-transparent transition-[background-color,box-shadow] duration-150 hover:bg-[var(--surface-muted)] focus:bg-[var(--surface)] focus:ring-[var(--primary)] disabled:cursor-default disabled:hover:bg-transparent"
     />
   );
 }

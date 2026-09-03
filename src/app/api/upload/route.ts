@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { generateJSON } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import Placeholder from "@tiptap/extension-placeholder";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { handle, jsonError } from "@/lib/api";
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     if (!(file instanceof File)) return jsonError("Choose a file to upload.", 400);
 
     const { title, html } = await fileToHtml(file);
-    const content = generateJSON(html, [StarterKit, Underline]);
+    const content = generateJSON(html, [StarterKit, Underline, Placeholder]);
 
     const document = await db.document.create({
       data: { title: parseTitle(title), content, ownerId: user.id },

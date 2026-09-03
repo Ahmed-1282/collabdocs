@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Avatar } from "./avatar";
+import { AlertIcon, ChevronLeftIcon, SpinnerIcon } from "./icons";
 
 type SeededUser = { email: string; name: string };
 
 export function LoginForm({ users }: { users: SeededUser[] }) {
   const router = useRouter();
-  const [email, setEmail] = useState(users[0]?.email ?? "");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   async function signIn(value: string) {
-    setPending(true);
+    setPendingEmail(value);
     setError(null);
 
     const response = await fetch("/api/session", {
@@ -24,7 +26,7 @@ export function LoginForm({ users }: { users: SeededUser[] }) {
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
       setError(body.error ?? "Could not sign in.");
-      setPending(false);
+      setPendingEmail(null);
       return;
     }
 
@@ -32,25 +34,41 @@ export function LoginForm({ users }: { users: SeededUser[] }) {
     router.refresh();
   }
 
+  const busy = pendingEmail !== null;
+
   return (
-    <div className="mt-6 space-y-5">
-      <div className="space-y-2">
+    <div className="mt-4 space-y-4">
+      <ul className="space-y-1.5">
         {users.map((user) => (
-          <button
-            key={user.email}
-            onClick={() => signIn(user.email)}
-            disabled={pending}
-            className="flex w-full items-center gap-3 rounded-lg border border-[var(--border)] px-4 py-3 text-left transition hover:border-[var(--accent)] hover:bg-blue-50 disabled:opacity-50"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-sm font-medium text-white">
-              {user.name.charAt(0)}
-            </span>
-            <span>
-              <span className="block text-sm font-medium">{user.name}</span>
-              <span className="block text-xs text-[var(--muted)]">{user.email}</span>
-            </span>
-          </button>
+          <li key={user.email}>
+            <button
+              onClick={() => signIn(user.email)}
+              disabled={busy}
+              className="group flex w-full cursor-pointer items-center gap-3 rounded-[var(--radius)] border border-[var(--border)] px-3 py-2.5 text-left transition-colors duration-150 hover:border-[var(--primary)] hover:bg-[var(--primary-soft)] disabled:cursor-wait disabled:opacity-60"
+            >
+              <Avatar name={user.name} email={user.email} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium">{user.name}</span>
+                <span className="block truncate text-xs text-[var(--text-muted)]">
+                  {user.email}
+                </span>
+              </span>
+              {pendingEmail === user.email ? (
+                <SpinnerIcon className="h-4 w-4 text-[var(--primary)]" />
+              ) : (
+                <ChevronLeftIcon className="h-4 w-4 rotate-180 text-[var(--text-subtle)] transition-transform duration-150 group-hover:translate-x-0.5" />
+              )}
+            </button>
+          </li>
         ))}
+      </ul>
+
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-[var(--border)]" />
+        <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
+          or
+        </span>
+        <span className="h-px flex-1 bg-[var(--border)]" />
       </div>
 
       <form
@@ -58,24 +76,25 @@ export function LoginForm({ users }: { users: SeededUser[] }) {
           event.preventDefault();
           signIn(email);
         }}
-        className="space-y-2 border-t border-[var(--border)] pt-5"
+        className="space-y-1.5"
       >
-        <label htmlFor="email" className="block text-xs font-medium text-[var(--muted)]">
-          Or enter an email
+        <label htmlFor="email" className="block text-xs font-medium text-[var(--text-muted)]">
+          Sign in with an email
         </label>
         <div className="flex gap-2">
           <input
             id="email"
             type="email"
+            required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="min-w-0 flex-1 rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
+            className="min-w-0 flex-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none transition-colors duration-150 placeholder:text-[var(--text-subtle)] hover:border-[var(--border-strong)] focus:border-[var(--primary)]"
             placeholder="alice@example.com"
           />
           <button
             type="submit"
-            disabled={pending}
-            className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            disabled={busy}
+            className="cursor-pointer rounded-[var(--radius)] bg-[var(--primary)] px-3.5 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-[var(--primary-hover)] disabled:cursor-wait disabled:opacity-60"
           >
             Sign in
           </button>
@@ -83,7 +102,11 @@ export function LoginForm({ users }: { users: SeededUser[] }) {
       </form>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-[var(--radius)] bg-[var(--danger-soft)] px-3 py-2 text-xs text-[var(--danger)]"
+        >
+          <AlertIcon className="mt-px h-3.5 w-3.5 shrink-0" />
           {error}
         </p>
       )}

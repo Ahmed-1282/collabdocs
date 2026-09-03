@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useEditor, EditorContent } from "@tiptap/react";
 import type { JSONContent } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import Placeholder from "@tiptap/extension-placeholder";
 import { DashboardHeader } from "./dashboard-header";
 import { EditorToolbar } from "./editor-toolbar";
 import { ShareDialog } from "./share-dialog";
 import { TitleInput } from "./title-input";
+import { AlertIcon, CheckIcon, ChevronLeftIcon, EyeIcon, SpinnerIcon } from "./icons";
 
 const AUTOSAVE_DELAY_MS = 800;
 
@@ -57,7 +60,7 @@ export function DocumentWorkspace({
         setErrorMessage(null);
         setSaveState("saved");
       } catch {
-        setErrorMessage("You appear to be offline. Changes are not saved.");
+        setErrorMessage("You appear to be offline. Your recent changes are not saved.");
         setSaveState("error");
       }
     },
@@ -68,11 +71,15 @@ export function DocumentWorkspace({
     // Next renders this component on the server first; TipTap must not.
     immediatelyRender: false,
     editable: canEdit,
-    extensions: [StarterKit, Underline],
+    extensions: [
+      StarterKit,
+      Underline,
+      Placeholder.configure({ placeholder: "Start writing…" }),
+    ],
     content: document.content,
     editorProps: {
       attributes: {
-        class: "tiptap min-h-[60vh] px-14 py-12 focus:outline-none",
+        class: "tiptap min-h-[62vh] px-6 py-10 sm:px-14 sm:py-14 focus:outline-none",
         "aria-label": "Document body",
       },
     },
@@ -102,37 +109,62 @@ export function DocumentWorkspace({
   }, [saveState]);
 
   return (
-    <div>
+    <div className="min-h-screen">
       <DashboardHeader user={user}>
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <Link
+            href="/documents"
+            aria-label="Back to all documents"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors duration-150 hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
+          >
+            <ChevronLeftIcon />
+          </Link>
+
           <TitleInput
             documentId={document.id}
             initialTitle={document.title}
             disabled={!canEdit}
             onSaveStateChange={setSaveState}
           />
+
           <SaveIndicator state={saveState} canEdit={canEdit} />
-          {isOwner && <ShareDialog documentId={document.id} shares={document.shares} />}
+
+          <div className="ml-auto shrink-0 pl-2">
+            {isOwner ? (
+              <ShareDialog documentId={document.id} shares={document.shares} />
+            ) : (
+              <span className="hidden items-center gap-1.5 rounded-full bg-[var(--surface-muted)] px-2.5 py-1 text-xs text-[var(--text-muted)] sm:inline-flex">
+                <EyeIcon className="h-3.5 w-3.5" />
+                {document.accessLevel === "editor" ? "Can edit" : "View only"}
+              </span>
+            )}
+          </div>
         </div>
       </DashboardHeader>
 
       <EditorToolbar editor={editor} disabled={!canEdit} />
 
       {!canEdit && (
-        <p className="border-b border-amber-200 bg-amber-50 px-6 py-2 text-sm text-amber-900">
-          You have view-only access to this document. Ask{" "}
-          {document.owner.name} for edit access to make changes.
+        <p className="flex items-center justify-center gap-2 border-b border-[var(--warning-border)] bg-[var(--warning-bg)] px-4 py-2 text-center text-xs text-[var(--warning-text)]">
+          <EyeIcon className="h-3.5 w-3.5 shrink-0" />
+          View-only access. Ask {document.owner.name} for edit access to make changes.
         </p>
       )}
 
       {errorMessage && (
-        <p role="alert" className="border-b border-red-200 bg-red-50 px-6 py-2 text-sm text-red-700">
+        <p
+          role="alert"
+          className="flex items-center justify-center gap-2 border-b border-[var(--danger)]/25 bg-[var(--danger-soft)] px-4 py-2 text-center text-xs text-[var(--danger)]"
+        >
+          <AlertIcon className="h-3.5 w-3.5 shrink-0" />
           {errorMessage}
         </p>
       )}
 
-      <main className="mx-auto my-8 max-w-3xl rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-sm">
-        <EditorContent editor={editor} />
+      <main className="px-3 py-6 sm:px-6 sm:py-8">
+        <div className="mx-auto max-w-3xl rounded-[12px] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-sm)]">
+          <EditorContent editor={editor} />
+        </div>
       </main>
     </div>
   );
@@ -141,19 +173,20 @@ export function DocumentWorkspace({
 function SaveIndicator({ state, canEdit }: { state: SaveState; canEdit: boolean }) {
   if (!canEdit) return null;
 
-  const label = {
-    saved: "All changes saved",
-    saving: "Saving…",
-    unsaved: "Unsaved changes",
-    error: "Save failed",
+  const { label, Icon, className } = {
+    saved: { label: "Saved", Icon: CheckIcon, className: "text-[var(--success)]" },
+    saving: { label: "Saving…", Icon: SpinnerIcon, className: "text-[var(--text-muted)]" },
+    unsaved: { label: "Unsaved", Icon: null, className: "text-[var(--text-subtle)]" },
+    error: { label: "Save failed", Icon: AlertIcon, className: "text-[var(--danger)]" },
   }[state];
 
   return (
     <span
       role="status"
       aria-live="polite"
-      className={`shrink-0 text-xs ${state === "error" ? "text-red-600" : "text-[var(--muted)]"}`}
+      className={`hidden shrink-0 items-center gap-1 text-xs whitespace-nowrap sm:inline-flex ${className}`}
     >
+      {Icon && <Icon className="h-3.5 w-3.5" />}
       {label}
     </span>
   );

@@ -36,12 +36,17 @@ Open two browsers (or one normal + one incognito) to hold two sessions at once.
 - **Autosave** — debounced 800 ms after you stop typing, with a live
   *Saving… / All changes saved / Save failed* indicator.
 - **Inline rename** — edit the title in the header; it saves on a debounce.
-- **File import** — upload a `.txt`, `.md`, or `.docx` file (max 1 MB) and it
-  becomes a new editable document with its formatting preserved.
+- **File import** — upload a `.txt`, `.md`, or `.docx` file (max 1 MB), or drag
+  one anywhere onto the dashboard, and it becomes a new editable document with
+  its formatting preserved.
 - **Sharing** — share by email as **Viewer** or **Editor**; revoke at any time.
   Only the owner can manage sharing.
 - **Owned vs shared** — the dashboard splits *My documents* from
-  *Shared with me*, each row tagged with your access level.
+  *Shared with me*, each card tagged with your access level.
+- **Responsive and accessible** — verified with no horizontal overflow at 390px,
+  768px, and 1440px. Keyboard-navigable throughout, with a focus-trapped share
+  dialog, visible focus rings, `aria-pressed` toolbar toggles, and
+  `prefers-reduced-motion` respected.
 
 ### Supported upload types
 
@@ -57,7 +62,7 @@ document is stored, so no blob storage is required.
 | Editor | TipTap 3 (ProseMirror) |
 | Database | Neon Postgres (serverless) |
 | ORM | Prisma 6 |
-| Styling | Tailwind CSS 4 |
+| Styling | Tailwind CSS 4, Plus Jakarta Sans, inline SVG icons |
 | Auth | Signed JWT session cookie (`jose`), no passwords |
 | Tests | Vitest |
 | Hosting | Vercel |
