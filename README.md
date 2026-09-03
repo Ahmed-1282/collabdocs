@@ -4,7 +4,7 @@ A lightweight collaborative document editor — create, edit, import, and share
 rich-text documents. Built as a focused product slice rather than a Google Docs
 clone.
 
-**Live demo:** _(add your Vercel URL here after deploying)_
+**Live demo:** <https://collabdocs-orcin.vercel.app>
 
 ## Reviewer quick start
 

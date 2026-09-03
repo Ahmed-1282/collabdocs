@@ -7,7 +7,7 @@
 
 | Item | Link |
 | --- | --- |
-| Live product | _(add Vercel URL)_ |
+| Live product | <https://collabdocs-orcin.vercel.app> |
 | Walkthrough video | _(add Loom/YouTube URL — also in `walkthrough-video.txt`)_ |
 | Source code | This repository |
 
@@ -49,6 +49,9 @@ To see sharing from both sides at once, use one normal window and one incognito.
 - ✅ Upload `.txt` / `.md` / `.docx` (max 1 MB) → becomes a new editable
   document with formatting preserved
 - ✅ Share by email as Viewer or Editor; revoke access; owner-only management
+- ✅ **Optional stretch delivered:** role-based sharing permissions beyond basic
+  access — Viewer and Editor are distinct roles on each share, enforced
+  server-side (a viewer's write is rejected with 403) and covered by tests
 - ✅ Dashboard splits **My documents** from **Shared with me**, tagged by access
   level
 - ✅ Server-side authorization on every route — viewers get 403 on write,

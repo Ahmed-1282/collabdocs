@@ -65,6 +65,14 @@ about documents you can't see. Viewers attempting a write are the one exception
 viewers, but that's a courtesy. Every route independently re-derives access from
 the session cookie; a hand-crafted `curl` gets the same answer as the UI.
 
+## The one stretch goal I took
+
+**Role-based sharing permissions.** The brief's minimum was "a way to grant
+another user access"; `Role` (VIEWER / EDITOR) sits on the `Share` row instead.
+It cost almost nothing at schema-design time and it is the stretch goal most
+connected to the core sharing model — the same access module that answers "can
+this person see it?" already had to answer "can they change it?".
+
 ## Deliberate cuts
 
 **Real-time collaboration — cut.** Correct multiplayer means CRDTs (Yjs), a
