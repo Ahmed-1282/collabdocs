@@ -1,0 +1,56 @@
+// Prisma schema for CollabDocs.
+// Two connection strings: the pooled URL serves app queries from serverless
+// functions, the direct URL is required for migrations (which pooling breaks).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String
+  documents Document[] @relation("DocumentOwner")
+  shares    Share[]
+  createdAt DateTime   @default(now())
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String   @default("Untitled document")
+  // TipTap ProseMirror JSON. Stored as JSON rather than HTML so the document
+  // structure survives round-trips and stays queryable.
+  content   Json
+  ownerId   String
+  owner     User     @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  shares    Share[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model Share {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  role       Role     @default(VIEWER)
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  // A user holds at most one role per document.
+  @@unique([documentId, userId])
+  @@index([userId])
+}
+
+enum Role {
+  VIEWER
+  EDITOR
+}
